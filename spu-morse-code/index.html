@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Morse Code Training Pro - SPU Amateur Radio Club</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Chakra Petch', sans-serif; }
+        .font-code { font-family: 'JetBrains Mono', monospace; }
+        /* เอฟเฟกต์เรืองแสงนุ่มๆ */
+        .glow-purple:hover { shadow: 0 0 15px rgba(168, 85, 247, 0.4); }
+        .glow-cyan:hover { shadow: 0 0 15px rgba(34, 211, 238, 0.4); }
+        /* คลาสสลับตอนกดเคาะ */
+        .tap-active {
+            background-color: rgba(6, 182, 212, 0.15) !important;
+            border-color: #06b6d4 !important;
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-[#0b0f19] text-slate-100 min-h-screen p-4 md:p-8 antialiased flex flex-col justify-between bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-[#0b0f19] to-[#05070c]">
+
+    <div>
+        <header class="w-full max-w-5xl mx-auto text-center my-6 md:my-10 backdrop-blur-sm bg-slate-900/20 p-6 rounded-3xl border border-slate-800/40 shadow-2xl">
+            <h1 class="text-3xl md:text-5xl font-extrabold bg-gradient-to-r from-cyan-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent tracking-wide">
+                MORSE CODE TRAINING
+            </h1>
+            <p class="text-xs md:text-sm text-slate-400 mt-3 font-medium tracking-wider uppercase">
+                Developed by Sripatum University Amateur Radio Club
+            </p>
+        </header>
+
+        <main class="max-w-6xl w-full mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            
+            <div class="lg:col-span-2 space-y-8">
+                
+                <section class="p-6 bg-slate-900/40 backdrop-blur-md border border-slate-800/60 rounded-2xl shadow-2xl transition-all duration-300 hover:border-slate-700/60">
+                    <div class="flex justify-between items-center mb-6">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-2 h-6 bg-purple-500 rounded-full"></div>
+                            <h2 class="font-bold text-xl text-purple-400 tracking-wide">โหมดฝึกฟัง</h2>
+                        </div>
+                        <div class="text-xs font-code bg-purple-950/40 border border-purple-800/30 px-3 py-1.5 rounded-full text-purple-300 shadow-inner">
+                            SPEED: <span id="wpmVal" class="font-bold text-purple-400 text-sm">15</span> WPM
+                        </div>
+                    </div>
+                    
+                    <input type="range" id="wpmSlider" min="5" max="30" value="15" class="w-full mb-6 accent-purple-500 bg-slate-800 h-2 rounded-lg cursor-pointer">
+                    
+                    <div class="grid grid-cols-2 gap-4 mb-5">
+                        <button id="listenLetters" class="bg-purple-600/90 hover:bg-purple-500 active:scale-[0.98] transition-all p-3 rounded-xl text-sm font-semibold shadow-lg shadow-purple-900/20 flex items-center justify-center gap-2">
+                            🎵 ฟังอักษร (Letters)
+                        </button>
+                        <button id="listenNumbers" class="bg-indigo-600/90 hover:bg-indigo-500 active:scale-[0.98] transition-all p-3 rounded-xl text-sm font-semibold shadow-lg shadow-indigo-900/20 flex items-center justify-center gap-2">
+                            🔢 ฟังตัวเลข (Numbers)
+                        </button>
+                    </div>
+                    
+                    <div class="relative mt-2">
+                        <input type="text" id="answerInput" class="w-full bg-slate-950/80 border border-slate-800 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 outline-none p-4 rounded-xl text-center uppercase font-code text-2xl tracking-widest transition-all placeholder:text-slate-700 shadow-inner text-purple-300" placeholder="พิมพ์คำตอบที่ได้ยิน">
+                    </div>
+                    <button id="checkBtn" class="w-full mt-3 bg-emerald-600 hover:bg-emerald-500 active:scale-[0.99] transition-all p-3 rounded-xl font-bold tracking-wide shadow-lg shadow-emerald-950/50">
+                        ตรวจสอบคำตอบ
+                    </button>
+                    <div id="resultMsg" class="mt-4 text-center font-bold text-lg min-h-[28px]"></div>
+                </section>
+
+                <section class="p-6 bg-slate-900/40 backdrop-blur-md border border-slate-800/60 rounded-2xl shadow-2xl transition-all duration-300 hover:border-slate-700/60">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-2 h-6 bg-cyan-500 rounded-full"></div>
+                        <h2 class="font-bold text-xl text-cyan-400 tracking-wide">โหมดเคาะอิสระ</h2>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-5 gap-4">
+                        <div class="sm:col-span-1 bg-slate-950/60 border border-slate-900 rounded-xl flex flex-col items-center justify-center p-3 shadow-inner">
+                            <span class="text-[11px] text-slate-500 font-medium uppercase tracking-wider mb-1">ตัวอักษร</span>
+                            <div class="text-3xl font-extrabold text-cyan-400" id="decodedLetter">?</div>
+                        </div>
+                        <div class="sm:col-span-1 bg-slate-950/60 border border-slate-900 rounded-xl flex flex-col items-center justify-center p-3 shadow-inner">
+                            <span class="text-[11px] text-slate-500 font-medium uppercase tracking-wider mb-1">รหัส</span>
+                            <div class="text-xl font-bold text-purple-400 font-code" id="decodedSymbol">?</div>
+                        </div>
+                        
+                        <div id="tapArea" class="sm:col-span-3 bg-slate-900/80 border-2 border-dashed border-slate-700/80 hover:border-cyan-500/50 rounded-xl flex flex-col items-center justify-center p-6 cursor-pointer select-none transition-all duration-150 group">
+                            <span class="text-sm font-semibold tracking-wide text-slate-300 group-hover:text-cyan-400 transition-colors">คลิกค้าง หรือ กด Spacebar</span>
+                            <span class="text-[10px] text-slate-500 mt-1">สั้น = จุด (.) / ยาว = ขีด (-)</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-5">
+                        <span class="text-[11px] text-slate-500 font-medium uppercase tracking-wider block mb-2">ข้อความที่บันทึกไว้:</span>
+                        <div id="historyDisplay" class="min-h-[60px] max-h-[120px] overflow-y-auto p-4 bg-slate-950/90 rounded-xl font-code text-xl text-emerald-400 break-all border border-slate-900 shadow-inner tracking-wider"></div>
+                    </div>
+                    <button id="clearBtn" class="w-full mt-3 bg-slate-800/60 hover:bg-slate-800 text-slate-400 hover:text-slate-200 py-2.5 rounded-xl text-xs font-semibold transition-all tracking-wider border border-slate-800">
+                        ล้างประวัติการบันทึก
+                    </button>
+                </section>
+            </div>
+
+            <section class="bg-slate-900/40 backdrop-blur-md border border-slate-800/60 rounded-2xl p-6 shadow-2xl h-fit sticky top-6 lg:col-span-1 transition-all duration-300 hover:border-slate-700/60">
+                <div class="flex items-center justify-center space-x-2 mb-5">
+                    <h2 class="font-bold text-lg text-amber-400 tracking-wide">คู่มือรหัสมอร์ส อ้างอิง</h2>
+                </div>
+                <div id="referenceTable" class="grid grid-cols-2 gap-2 text-xs font-code overflow-y-auto max-h-[520px] pr-1">
+                    </div>
+            </section>
+        </main>
+    </div>
+
+    <footer class="w-full text-center py-8 text-xs text-slate-500 space-y-1.5 mt-10 border-t border-slate-900/60 backdrop-blur-sm bg-slate-950/20">
+        <p class="tracking-wide">© 2026 Sripatum University Amateur Radio Club. All Rights Reserved.</p>
+        <p class="font-code text-slate-600 text-[11px]">
+            Designed & Developed by <span class="text-cyan-500/80 font-bold bg-cyan-950/30 px-2 py-0.5 rounded border border-cyan-900/30">E25DUV</span>
+        </p>
+    </footer>
+
+    <script>
+        const morseMap = { 
+            '.-':'A', '-...':'B', '-.-.':'C', '-..':'D', '.':'E', '..-.':'F', '--.':'G', '....':'H', '..':'I', '.---':'J', '-.-':'K', '.-..':'L', '--':'M', '-.':'N', '---':'O', '.--.':'P', '--.-':'Q', '.-.':'R', '...':'S', '-':'T', '..-':'U', '...-':'V', '.--':'W', '-..-':'X', '-.--':'Y', '--..':'Z', 
+            '-----':'0', '.----':'1', '..---':'2', '...--':'3', '....-':'4', '.....':'5', '-....':'6', '--...':'7', '---..':'8', '----.':'9',
+            '.-.-.-':'.', '--..--':',', '..--..':'?', '-....-':'-', '-..-.':'/', '.--.-.':'@', '.-..-.':'"', '---...':':', '-.-.-.':';', '-...-':'=', '.-.-.':'+', '..--.-':'_'
+        };
+        const reverseMap = Object.fromEntries(Object.entries(morseMap).map(([k, v]) => [v, k]));
+        
+        // สร้างตารางอ้างอิงให้สวยงามมีมิติขึ้น
+        const refContainer = document.getElementById('referenceTable');
+        Object.entries(morseMap).forEach(([code, char]) => {
+            refContainer.innerHTML += `<div class="bg-slate-950/60 border border-slate-900/80 p-2 rounded-lg flex justify-between items-center hover:bg-slate-900/60 transition-colors"><span class="text-amber-400 font-bold text-sm">${char}</span><span class="text-slate-400 font-medium">${code}</span></div>`;
+        });
+
+        let currentSequence = [];
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let osc = null, gainNode = null;
+        let pressTime, timeout, isPressed = false;
+        let buffer = "";
+
+        const tapArea = document.getElementById('tapArea');
+
+        const startTone = () => {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            if (osc) return;
+            osc = audioCtx.createOscillator();
+            gainNode = audioCtx.createGain();
+            osc.connect(gainNode); gainNode.connect(audioCtx.destination);
+            osc.frequency.value = 650;
+            gainNode.gain.value = 0.3;
+            osc.start();
+            // ใส่ UI effect ตอนเริ่มเคาะ
+            tapArea.classList.add('tap-active');
+        };
+        
+        const stopTone = () => { 
+            if (osc) { 
+                osc.stop(); 
+                osc.disconnect(); 
+                osc = null; 
+            } 
+            // เอา UI effect ออกตอนปล่อยเคาะ
+            tapArea.classList.remove('tap-active');
+        };
+        
+        const startMorse = () => { if(isPressed) return; isPressed = true; pressTime = Date.now(); startTone(); };
+
+        const stopMorse = () => {
+            if(!isPressed) return;
+            isPressed = false;
+            stopTone();
+            let duration = Date.now() - pressTime;
+            buffer += (duration < 200) ? "." : "-";
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                const char = morseMap[buffer] || "?";
+                document.getElementById('decodedLetter').innerText = char;
+                document.getElementById('decodedSymbol').innerText = buffer;
+                document.getElementById('historyDisplay').innerText += char;
+                // auto-scroll ประวัติไปขวาสุด/ล่างสุด
+                const historyDiv = document.getElementById('historyDisplay');
+                historyDiv.scrollTop = historyDiv.scrollHeight;
+                buffer = "";
+            }, 700);
+        };
+
+        tapArea.onmousedown = (e) => { e.preventDefault(); startMorse(); };
+        tapArea.onmouseup = stopMorse;
+        tapArea.onmouseleave = stopMorse;
+        
+        // สำหรับ Touch Screen บนมือถือ
+        tapArea.addEventListener('touchstart', (e) => { e.preventDefault(); startMorse(); });
+        tapArea.addEventListener('touchend', (e) => { e.preventDefault(); stopMorse(); });
+
+        window.addEventListener('keydown', (e) => { 
+            if(e.code === 'Space' && !isPressed) { 
+                if(document.activeElement !== document.getElementById('answerInput')) {
+                    e.preventDefault(); 
+                    startMorse(); 
+                }
+            } 
+        });
+        window.addEventListener('keyup', (e) => { 
+            if(e.code === 'Space') {
+                if(document.activeElement !== document.getElementById('answerInput')) {
+                    stopMorse(); 
+                }
+            }
+        });
+        
+        document.getElementById('wpmSlider').oninput = (e) => document.getElementById('wpmVal').innerText = e.target.value;
+
+        async function playSequence(arr) {
+            let unit = 1200 / parseInt(document.getElementById('wpmSlider').value);
+            for (let char of arr) {
+                let code = reverseMap[char];
+                if(!code) continue;
+                for (let dot of code) {
+                    startTone();
+                    await new Promise(r => setTimeout(r, dot === '.' ? unit : unit * 3));
+                    stopTone();
+                    await new Promise(r => setTimeout(r, unit));
+                }
+                await new Promise(r => setTimeout(r, unit * 2));
+            }
+        }
+        
+        document.getElementById('listenLetters').onclick = () => {
+            document.getElementById('resultMsg').innerText = "";
+            document.getElementById('answerInput').value = "";
+            const keys = Object.values(morseMap).filter(v => isNaN(v) && v.length === 1);
+            currentSequence = Array.from({length: 5}, () => keys[Math.floor(Math.random() * keys.length)]);
+            playSequence(currentSequence);
+        };
+        
+        document.getElementById('listenNumbers').onclick = () => {
+            document.getElementById('resultMsg').innerText = "";
+            document.getElementById('answerInput').value = "";
+            const keys = Object.values(morseMap).filter(v => !isNaN(v));
+            currentSequence = Array.from({length: 5}, () => keys[Math.floor(Math.random() * keys.length)]);
+            playSequence(currentSequence);
+        };
+        
+        document.getElementById('checkBtn').onclick = () => {
+            const ans = document.getElementById('answerInput').value.trim().toUpperCase();
+            const target = currentSequence.join("");
+            const msgEl = document.getElementById('resultMsg');
+            
+            if(!target) {
+                msgEl.className = "mt-4 text-center font-bold text-lg text-amber-400";
+                msgEl.innerText = "⚠️ กรุณากดฟังรหัสก่อนตรวจคำตอบ";
+                return;
+            }
+
+            if (ans === target) {
+                msgEl.className = "mt-4 text-center font-bold text-lg text-emerald-400 drop-shadow-[0_0_10px_rgba(52,211,153,0.3)]";
+                msgEl.innerText = "✅ ถูกต้องยอดเยี่ยม!";
+            } else {
+                msgEl.className = "mt-4 text-center font-bold text-lg text-rose-400";
+                msgEl.innerText = `❌ ยังไม่ถูก (คำตอบคือ: ${target})`;
+            }
+        };
+        
+        document.getElementById('clearBtn').onclick = () => {
+            document.getElementById('historyDisplay').innerText = "";
+            document.getElementById('decodedLetter').innerText = "?";
+            document.getElementById('decodedSymbol').innerText = "?";
+        };
+    </script>
+</body>
+</html>
